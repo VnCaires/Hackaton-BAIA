@@ -58,3 +58,17 @@ def load_malha_geojson() -> dict:
         DATA_PROCESSED / "ba.geojson", EXAMPLES / "ba_municipios.geojson"
     )
     return json.loads(caminho.read_text())
+
+
+def load_indicadores_estacao() -> pd.DataFrame:
+    caminho = _primeiro_existente(
+        DATA_PROCESSED / "indicadores_estacao.csv", EXAMPLES / "indicadores_estacao.csv"
+    )
+    return pd.read_csv(caminho)
+
+
+def load_indicadores_anuais() -> pd.DataFrame:
+    caminho = _primeiro_existente(
+        DATA_PROCESSED / "indicadores_anuais.csv", EXAMPLES / "indicadores_anuais.csv"
+    )
+    return pd.read_csv(caminho)

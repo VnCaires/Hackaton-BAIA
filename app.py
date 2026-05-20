@@ -19,7 +19,53 @@ from streamlit_folium import st_folium
 
 from municipios_score import ia, io, vulnerabilidade as vuln
 
-st.set_page_config(page_title="Calculadora de Orcamento Climatico - Bahia", layout="wide")
+st.set_page_config(
+    page_title="Calculadora de Orcamento Climatico - Bahia", layout="wide", page_icon="BA"
+)
+
+_CSS = """
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap');
+  html, body, [class*="css"] { font-family: 'Fira Sans', system-ui, sans-serif; }
+  .hero {
+    background: linear-gradient(120deg, #1E3A8A 0%, #1E40AF 60%, #2563EB 100%);
+    color: #fff; border-radius: 14px; padding: 22px 26px; margin-bottom: 18px;
+  }
+  .hero h1 { font-size: 28px; font-weight: 700; margin: 0 0 4px; letter-spacing: -.4px; }
+  .hero p { margin: 0; opacity: .92; font-size: 15px; max-width: 760px; }
+  .hero .gold { color: #FBBF24; font-weight: 700; }
+  .kpi-row { display: flex; gap: 12px; flex-wrap: wrap; margin: 2px 0 18px; }
+  .kpi { flex: 1; min-width: 130px; background: #fff; border: 1px solid #DBEAFE;
+    border-left: 4px solid #D97706; border-radius: 10px; padding: 12px 16px; }
+  .kpi b { display: block; font-size: 24px; color: #1E3A8A; line-height: 1.1;
+    font-variant-numeric: tabular-nums; }
+  .kpi span { font-size: 11px; color: #5B6B86; text-transform: uppercase; letter-spacing: .4px; }
+  div[data-testid="stMetricValue"] { color: #1E3A8A; }
+  .stButton>button, .stDownloadButton>button { border-radius: 8px; font-weight: 600; }
+  .stTabs [data-baseweb="tab"] { font-weight: 600; }
+  .stTabs [aria-selected="true"] { color: #D97706; }
+</style>
+"""
+
+
+def _hero() -> None:
+    st.markdown(_CSS, unsafe_allow_html=True)
+    st.markdown(
+        '<div class="hero"><h1>Calculadora de Orcamento Climatico da Bahia</h1>'
+        '<p>Informe o orcamento e veja <span class="gold">quanto vai para cada um dos 417 '
+        "municipios</span>, priorizando os mais vulneraveis. Nao prevemos o tempo: dizemos onde "
+        "investir.</p></div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<div class="kpi-row">'
+        '<div class="kpi"><b>417</b><span>municipios</span></div>'
+        '<div class="kpi"><b>21 anos</b><span>INMET 2000-2021</span></div>'
+        '<div class="kpi"><b>45</b><span>estacoes</span></div>'
+        '<div class="kpi"><b>&Sigma; = 1</b><span>pesos normalizados</span></div>'
+        "</div>",
+        unsafe_allow_html=True,
+    )
 
 METRICAS = {
     "Vulnerabilidade geral": "ameaca",
@@ -125,11 +171,7 @@ def tela_arquetipos(df: pd.DataFrame) -> None:
 
 
 def main() -> None:
-    st.title("Calculadora de Orcamento Climatico da Bahia")
-    st.caption(
-        "Informe o orcamento e veja quanto vai para cada um dos 417 municipios, priorizando os mais "
-        "vulneraveis. Indice nao-supervisionado a partir de 21 anos de dados INMET (PCA + clustering + projecao)."
-    )
+    _hero()
     df, geo = carregar()
     aba1, aba2, aba3 = st.tabs(["Calculadora de Orcamento", "Mapa de Risco", "Arquetipos & Projecao"])
     with aba1:
