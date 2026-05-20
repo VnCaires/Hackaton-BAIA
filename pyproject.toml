@@ -11,11 +11,20 @@ requires-python = ">=3.10"
 dependencies = [
   "pandas>=2.2",
   "numpy>=1.26",
+  "scikit-learn>=1.4",
+  "shapely>=2.0",
+  "requests>=2.31",
 ]
 
 [project.optional-dependencies]
 dev = [
   "pytest>=8.0",
+]
+app = [
+  "streamlit>=1.35",
+  "streamlit-folium>=0.21",
+  "folium>=0.20",
+  "anthropic>=0.40",
 ]
 
 [tool.setuptools.packages.find]
