@@ -126,6 +126,10 @@ def tela_calculadora(df: pd.DataFrame) -> None:
         m1, m2 = st.columns(2)
         m1.metric("Municipios contemplados", f"{(aloc.valor_rs > 0).sum()} / 417")
         m2.metric("Soma alocada", f"R$ {aloc.valor_rs.sum():,.0f}")
+    st.caption(
+        f"Municipios com risco abaixo do limiar de contemplacao ({vuln.LIMIAR_CONTEMPLACAO:.0%}) "
+        "nao recebem verba: baixo risco climatico nao e prioridade e evita micro-transferencias."
+    )
     tabela = aloc.rename(columns={"nome": "Municipio", "peso": "Peso", "valor_rs": "Valor (R$)", "ameaca": "Ameaca"})
     st.dataframe(
         tabela[["Municipio", "Ameaca", "Peso", "Valor (R$)"]],

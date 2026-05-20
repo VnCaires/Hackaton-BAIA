@@ -67,6 +67,17 @@ def test_hazard_pesos_zerados_usa_ameaca() -> None:
     assert hazard_por_pesos(df, 0.0, 0.0, 0.0).iloc[0] == 0.7
 
 
+def test_limiar_contemplacao_zera_baixo_risco() -> None:
+    from municipios_score.vulnerabilidade import LIMIAR_CONTEMPLACAO
+
+    abaixo = LIMIAR_CONTEMPLACAO / 2
+    ameaca = pd.Series([abaixo, 0.9])  # primeiro abaixo do limiar -> nao contemplado
+    capacidade = pd.Series([0.6, 0.6])
+    pesos = peso_per_capita(ameaca, capacidade)
+    assert pesos.iloc[0] == 0.0
+    assert abs(pesos.sum() - 1.0) < 1e-9  # soma 1 entre os contemplados
+
+
 def test_alocar_distribui_todo_orcamento() -> None:
     df = pd.DataFrame({
         "codigo": ["1", "2", "3"], "nome": ["A", "B", "C"], "populacao": [100, 200, 300],
