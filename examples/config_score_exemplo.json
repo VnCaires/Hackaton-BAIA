@@ -1,0 +1,22 @@
+{
+  "municipality_col": "municipio",
+  "id_col": "codigo_municipio",
+  "indicators": [
+    {
+      "column": "idhm",
+      "weight": 0.45,
+      "direction": "positive"
+    },
+    {
+      "column": "taxa_desemprego",
+      "weight": 0.25,
+      "direction": "negative"
+    },
+    {
+      "column": "cobertura_saude",
+      "weight": 0.30,
+      "direction": "positive"
+    }
+  ]
+}
+
