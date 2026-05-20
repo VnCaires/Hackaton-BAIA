@@ -9,16 +9,36 @@ Plano completo e metodologia: [`docs/Plano.md`](docs/Plano.md)
 
 INMET (21 anos) -> sub-indices seca/enchente/calor -> **PCA** aprende a ameaca -> **IDW** interpola
 45 estacoes para 417 municipios -> capacidade adaptativa (IDHM) -> **peso per capita que soma 1**.
-Mais **KMeans** (arquetipos), **projecao 2030** e **Claude** (explica). Tudo nao-supervisionado.
+Mais **KMeans** (arquetipos), **projecao 2030** e **OpenAI GPT** (explica). Tudo nao-supervisionado.
 
 ```bash
 pip install -e ".[app]"
-python scripts/baixar_municipios_ibge.py   # baixa IBGE + IDHM (uma vez)
-python scripts/build_scores.py             # gera data/processed/scores.csv
-streamlit run app.py                       # sobe a calculadora
+python scripts/build_scores.py   # gera data/processed/scores.csv (usa examples/, sem dataset bruto)
+streamlit run app.py             # sobe a calculadora
 ```
 
-O app funciona com os exemplos versionados em `examples/` mesmo sem rodar o build.
+O app e o build funcionam com os exemplos versionados em `examples/` mesmo sem o dataset bruto.
+Para regenerar tudo do zero: `python scripts/baixar_municipios_ibge.py` (IBGE+IDHM) e
+`python scripts/baixar_dataset_inmet.py` (CSV bruto), depois `build_scores.py`.
+
+## Dados
+
+O **necessario ja esta no repositorio** (pequeno, em `examples/`): indicadores por estacao,
+malha municipal, populacao+IDHM e os scores finais. Por isso o app roda sem baixar nada.
+
+O **dataset bruto do INMET** (CSV horario, 549 MB) nao vai no Git (regra do projeto). Fica em:
+
+- **GitHub Release**: [`dataset-v1`](https://github.com/VnCaires/Hackaton-BAIA/releases/tag/dataset-v1) (`clima_bahia.csv.gz`, ~122 MB) — mirror para reprodutibilidade.
+- **Google Drive** (oficial): pasta `01_DADOS_OFICIAIS`.
+
+Baixe com `python scripts/baixar_dataset_inmet.py` (tenta o Release, cai para o Drive).
+
+## IA (opcional)
+
+As explicacoes por municipio usam um LLM. **Sem chave, ha um fallback offline deterministico**
+(o app nunca quebra). Para ativar o LLM, copie `.env.example` para `.env` e preencha
+`OPENAI_API_KEY` (provedor padrao: OpenAI; `gpt-4o-mini`). O score em si (PCA/KMeans/projecao)
+nao depende de IA externa.
 
 ## Objetivo (baseline generico)
 

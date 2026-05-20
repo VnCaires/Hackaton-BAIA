@@ -1,19 +1,28 @@
-"""Camada de linguagem (Claude Haiku) para explicar o score e recomendar gasto.
+"""Camada de linguagem (OpenAI GPT por padrao) para explicar o score e recomendar gasto.
 
 Honesta: a IA NAO calcula score (isso e o PCA/clustering/projecao). Ela so traduz
-os numeros em texto e prioridade de investimento. Sem ANTHROPIC_API_KEY, cai num
-gerador deterministico (mesma estrutura, custo zero) para a demo nunca quebrar.
+os numeros em texto e prioridade de investimento. A chave vem do ambiente / .env
+(ver config.py) e NUNCA e versionada. Sem chave, cai num gerador deterministico
+(mesma estrutura, custo zero) para a demo nunca quebrar.
+
+Provedor: OpenAI por padrao (LLM_PROVIDER=openai). Claude so se LLM_PROVIDER=anthropic.
 """
 from __future__ import annotations
 
 import json
 import os
 
-from . import io
+from . import config, io
 
-MODELO = "claude-haiku-4-5"
+OPENAI_MODEL_PADRAO = "gpt-4o-mini"
+ANTHROPIC_MODEL_PADRAO = "claude-haiku-4-5"
 CACHE = io.DATA_PROCESSED / "ia_cache.json"
 _ROTULO = {"seca": "seca", "enchente": "enchentes", "calor": "calor extremo"}
+
+
+def provedor_ativo() -> str | None:
+    """Check de configuracao: 'openai', 'anthropic' ou None (usa fallback offline)."""
+    return config.provedor_llm()
 
 
 def _cache() -> dict:
@@ -49,24 +58,38 @@ def _fallback_recomendacao(nome: str, valor: float, sub: dict) -> str:
     return f"Alocar R$ {valor:,.0f} prioritariamente em {acao}, principal vetor de risco de {nome}."
 
 
-def _cliente():
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        return None
-    try:
-        from anthropic import Anthropic
+def _gerar(prompt: str, max_tokens: int) -> str | None:
+    prov = config.provedor_llm()
+    if prov == "openai":
+        return _gerar_openai(prompt, max_tokens)
+    if prov == "anthropic":
+        return _gerar_anthropic(prompt, max_tokens)
+    return None
 
-        return Anthropic()
+
+def _gerar_openai(prompt: str, max_tokens: int) -> str | None:
+    try:
+        from openai import OpenAI
+
+        cliente = OpenAI()  # le OPENAI_API_KEY do ambiente (nunca passada em codigo)
+        modelo = os.environ.get("OPENAI_MODEL", OPENAI_MODEL_PADRAO)
+        resp = cliente.chat.completions.create(
+            model=modelo,
+            max_tokens=max_tokens,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return (resp.choices[0].message.content or "").strip() or None
     except Exception:
         return None
 
 
-def _gerar(prompt: str, max_tokens: int) -> str | None:
-    cliente = _cliente()
-    if cliente is None:
-        return None
+def _gerar_anthropic(prompt: str, max_tokens: int) -> str | None:
     try:
-        msg = cliente.messages.create(
-            model=MODELO, max_tokens=max_tokens, messages=[{"role": "user", "content": prompt}]
+        from anthropic import Anthropic
+
+        modelo = os.environ.get("ANTHROPIC_MODEL", ANTHROPIC_MODEL_PADRAO)
+        msg = Anthropic().messages.create(
+            model=modelo, max_tokens=max_tokens, messages=[{"role": "user", "content": prompt}]
         )
         return msg.content[0].text.strip()
     except Exception:
