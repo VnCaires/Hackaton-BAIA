@@ -61,6 +61,7 @@ Para a visao de produto, escopo e guia tecnico da equipe, consulte `docs/project
 |   |-- raw/          # datasets originais, nao versionados
 |   |-- interim/      # dados intermediarios, nao versionados
 |   |-- processed/    # dados finais, nao versionados
+|   |-- sample/       # recortes pequenos versionados para desenvolvimento
 |   `-- README.md
 |-- docs/             # dicionario de dados e decisoes do projeto
 |-- examples/         # exemplos pequenos e seguros para versionar
@@ -86,6 +87,8 @@ Para calcular scores com os arquivos de exemplo:
 ```bash
 python -m municipios_score.cli examples/indicadores_exemplo.csv examples/config_score_exemplo.json outputs/scores.csv
 ```
+
+O repositorio inclui `data/sample/clima_bahia_2020.csv.gz`, um recorte comprimido do ultimo ano completo do dataset climatico. Ele serve para desenvolvimento local sem baixar o CSV bruto completo.
 
 ## Fluxo de colaboracao
 
