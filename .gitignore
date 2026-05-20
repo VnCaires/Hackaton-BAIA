@@ -28,6 +28,8 @@ outputs/*
 !data/raw/.gitkeep
 !data/interim/.gitkeep
 !data/processed/.gitkeep
+!data/sample/
+!data/sample/**
 !outputs/.gitkeep
 
 # Notebooks
