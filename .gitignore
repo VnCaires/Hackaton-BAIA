@@ -38,3 +38,7 @@ outputs/*
 Thumbs.db
 .vscode/
 .idea/
+
+# uv (projeto usa pip/requirements)
+uv.lock
+.venv/

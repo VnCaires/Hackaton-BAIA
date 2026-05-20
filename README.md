@@ -1,10 +1,28 @@
-# Hackaton BAIA
+# Hackaton BAIA — Calculadora de Orcamento Climatico
 
 Repositorio colaborativo para desenvolver um indice de vulnerabilidade climatica e uma calculadora de orcamento para os 417 municipios da Bahia.
 
-## Objetivo
+Apresentacao visual: https://termometro-climatico-bahia.surge.sh
+Plano completo e metodologia: [`docs/Plano.md`](docs/Plano.md)
 
-Criar um pipeline reproduzivel que:
+## Como funciona
+
+INMET (21 anos) -> sub-indices seca/enchente/calor -> **PCA** aprende a ameaca -> **IDW** interpola
+45 estacoes para 417 municipios -> capacidade adaptativa (IDHM) -> **peso per capita que soma 1**.
+Mais **KMeans** (arquetipos), **projecao 2030** e **Claude** (explica). Tudo nao-supervisionado.
+
+```bash
+pip install -e ".[app]"
+python scripts/baixar_municipios_ibge.py   # baixa IBGE + IDHM (uma vez)
+python scripts/build_scores.py             # gera data/processed/scores.csv
+streamlit run app.py                       # sobe a calculadora
+```
+
+O app funciona com os exemplos versionados em `examples/` mesmo sem rodar o build.
+
+## Objetivo (baseline generico)
+
+O baseline tambem oferece um pipeline reproduzivel de score ponderado:
 
 1. Carrega datasets de municipios.
 2. Padroniza indicadores em uma escala comum.
