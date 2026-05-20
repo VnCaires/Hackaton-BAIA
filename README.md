@@ -1,8 +1,6 @@
 # Hackaton BAIA — Calculadora de Orcamento Climatico
 
-**E uma calculadora de orcamento.** Voce informa quanto o estado tem para resiliencia climatica e
-ela devolve quanto vai para cada um dos 417 municipios da Bahia, priorizando os mais vulneraveis e
-com menor capacidade de se defenderem sozinhos. Nao prevemos o tempo: dizemos onde investir.
+Repositorio colaborativo para desenvolver um indice de vulnerabilidade climatica e uma calculadora de orcamento para os 417 municipios da Bahia.
 
 Apresentacao visual: https://termometro-climatico-bahia.surge.sh
 Plano completo e metodologia: [`docs/Plano.md`](docs/Plano.md)
@@ -49,7 +47,11 @@ O baseline tambem oferece um pipeline reproduzivel de score ponderado:
 1. Carrega datasets de municipios.
 2. Padroniza indicadores em uma escala comum.
 3. Calcula um score ponderado por municipio.
-4. Gera rankings e artefatos para analise.
+4. Converte scores em pesos de vulnerabilidade que somam 1.
+5. Recomenda quanto cada municipio deve receber a partir de um orcamento total.
+6. Gera rankings e artefatos para analise.
+
+Para a visao de produto, escopo e guia tecnico da equipe, consulte `docs/project_overview.md`.
 
 ## Estrutura
 
