@@ -1,6 +1,6 @@
 # Hackaton BAIA
 
-Repositorio colaborativo para desenvolver um algoritmo de score de municipios a partir de datasets publicos ou internos.
+Repositorio colaborativo para desenvolver um indice de vulnerabilidade climatica e uma calculadora de orcamento para os 417 municipios da Bahia.
 
 ## Objetivo
 
@@ -9,7 +9,11 @@ Criar um pipeline reproduzivel que:
 1. Carrega datasets de municipios.
 2. Padroniza indicadores em uma escala comum.
 3. Calcula um score ponderado por municipio.
-4. Gera rankings e artefatos para analise.
+4. Converte scores em pesos de vulnerabilidade que somam 1.
+5. Recomenda quanto cada municipio deve receber a partir de um orcamento total.
+6. Gera rankings e artefatos para analise.
+
+Para a visao de produto, escopo e guia tecnico da equipe, consulte `docs/project_overview.md`.
 
 ## Estrutura
 
