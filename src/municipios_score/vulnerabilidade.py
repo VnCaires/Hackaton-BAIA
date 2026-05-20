@@ -58,14 +58,15 @@ def ajustar_ameaca_pca(sub: pd.DataFrame) -> tuple[PCA, StandardScaler]:
     return pca, scaler
 
 
-AMEACA_PISO = 0.02  # menor risco recebe valor minusculo (>0), nao zero -> todos contemplados
+# limiar de contemplacao: municipio com ameaca abaixo disso e baixa prioridade e NAO recebe
+# verba (peso 0). Evita pulverizar valores irrisorios (ex.: R$48 para Salvador) e o risco de
+# corrupcao/custo administrativo de micro-transferencias. Ajustavel.
+LIMIAR_CONTEMPLACAO = 0.20
 
 
 def aplicar_ameaca(df: pd.DataFrame, pca: PCA, scaler: StandardScaler) -> pd.Series:
     bruto = pca.transform(scaler.transform(df[CATEGORIAS]))[:, 0]
-    norm = normalizar_robusto(pd.Series(bruto, index=df.index))
-    # mapeia [0,1] -> [piso,1] para nenhum municipio ficar exatamente em 0 (todos recebem algo)
-    return norm * (1 - AMEACA_PISO) + AMEACA_PISO
+    return normalizar_robusto(pd.Series(bruto, index=df.index))
 
 
 def centroides_municipios() -> pd.DataFrame:
@@ -136,13 +137,16 @@ def montar_scores() -> pd.DataFrame:
 
 
 def peso_per_capita(ameaca: pd.Series, capacidade: pd.Series) -> pd.Series:
-    """Peso de alocacao per capita, soma = 1.
+    """Peso de alocacao per capita, soma = 1 (entre os contemplados).
 
     IPCC: vulnerabilidade ~ ameaca / capacidade adaptativa. Menor capacidade (IDHM)
-    -> maior peso. Salvador (alta capacidade, baixa ameaca) fica baixo; sertao sobe.
+    -> maior peso. Municipio com ameaca < LIMIAR_CONTEMPLACAO nao e contemplado (peso 0):
+    baixo risco climatico nao e prioridade e evita micro-transferencias.
     """
-    bruto = ameaca / capacidade.clip(lower=1e-6)
-    return bruto / bruto.sum()
+    efetiva = ameaca.where(ameaca >= LIMIAR_CONTEMPLACAO, 0.0)
+    bruto = efetiva / capacidade.clip(lower=1e-6)
+    total = bruto.sum()
+    return bruto / total if total else bruto
 
 
 def hazard_por_pesos(df: pd.DataFrame, w_seca: float, w_enchente: float, w_calor: float) -> pd.Series:

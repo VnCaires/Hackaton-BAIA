@@ -75,8 +75,14 @@ sertão oeste, sub-amostrado.
   resposta sobe; cidade rica e de baixo risco (Salvador) cai. A verba segue a gravidade e a
   vulnerabilidade, não o tamanho da cidade.
 
-### 4.5 Calculadora
-`R$_município = orçamento_total × peso_município`. A soma fecha no orçamento.
+### 4.5 Limiar de contemplação
+Municípios com ameaça abaixo de um limiar (padrão 20%) são **não contemplados** (peso 0): baixo
+risco climático não é prioridade e evita pulverizar micro-transferências (custo administrativo e
+risco de corrupção). Decisão de política, explícita e ajustável (`LIMIAR_CONTEMPLACAO`).
+
+### 4.6 Calculadora
+`R$_município = orçamento_total × peso_município`. A soma fecha no orçamento, distribuída só
+entre os contemplados.
 
 ### Validação (saída real do pipeline)
 - **Salvador**: ameaça ≈ 0,00 (litoral chuvoso), peso ≈ 0.
