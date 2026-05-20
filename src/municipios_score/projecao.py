@@ -53,7 +53,7 @@ def _rotulo(slope: float) -> str:
 
 def projetar(df_scores: pd.DataFrame) -> pd.DataFrame:
     """Adiciona `ameaca_futura` e `tendencia` ao df de scores."""
-    anual = pd.read_csv(io.DATA_PROCESSED / "indicadores_anuais.csv")
+    anual = io.load_indicadores_anuais()
     estacoes = io.load_estacoes().rename(columns={"latitude": "lat", "longitude": "lon"})
 
     tend = _tendencia_estacao(_proxy_anual(anual)).set_index("estacao")

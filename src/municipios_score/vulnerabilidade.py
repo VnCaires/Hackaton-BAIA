@@ -107,7 +107,7 @@ def _haversine(lat1, lon1, lat2, lon2):
 
 def montar_scores() -> pd.DataFrame:
     """Pipeline completo -> df municipios com sub-indices, ameaca, capacidade e peso."""
-    ind = pd.read_csv(io.DATA_PROCESSED / "indicadores_estacao.csv")
+    ind = io.load_indicadores_estacao()
     estacoes = io.load_estacoes().rename(columns={"latitude": "lat", "longitude": "lon"})
 
     sub = subindices_estacao(ind).set_index("estacao")
