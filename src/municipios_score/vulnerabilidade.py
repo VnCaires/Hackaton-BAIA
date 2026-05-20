@@ -58,9 +58,14 @@ def ajustar_ameaca_pca(sub: pd.DataFrame) -> tuple[PCA, StandardScaler]:
     return pca, scaler
 
 
+AMEACA_PISO = 0.02  # menor risco recebe valor minusculo (>0), nao zero -> todos contemplados
+
+
 def aplicar_ameaca(df: pd.DataFrame, pca: PCA, scaler: StandardScaler) -> pd.Series:
     bruto = pca.transform(scaler.transform(df[CATEGORIAS]))[:, 0]
-    return normalizar_robusto(pd.Series(bruto, index=df.index))
+    norm = normalizar_robusto(pd.Series(bruto, index=df.index))
+    # mapeia [0,1] -> [piso,1] para nenhum municipio ficar exatamente em 0 (todos recebem algo)
+    return norm * (1 - AMEACA_PISO) + AMEACA_PISO
 
 
 def centroides_municipios() -> pd.DataFrame:
