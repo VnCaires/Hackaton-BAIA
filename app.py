@@ -101,7 +101,6 @@ def mapa(df: pd.DataFrame, geo: dict, coluna: str) -> folium.Map:
             "weight": 0.4, "fillOpacity": 0.75,
         },
         tooltip=folium.GeoJsonTooltip(fields=["nome", "valor"], aliases=["Municipio", "Indice"]),
-        popup=folium.GeoJsonPopup(fields=["codarea"], aliases=["Codigo"]),
     ).add_to(m)
     escala.add_to(m)
     return m
@@ -123,7 +122,6 @@ def municipio_do_clique(retorno_mapa: dict | None, df: pd.DataFrame) -> str | No
 
     textos = [
         str(retorno_mapa.get("last_object_clicked_tooltip") or ""),
-        str(retorno_mapa.get("last_object_clicked_popup") or ""),
     ]
     for texto in textos:
         for _, linha in df.iterrows():
@@ -183,7 +181,6 @@ def tela_mapa(df: pd.DataFrame, geo: dict) -> None:
             returned_objects=[
                 "last_active_drawing",
                 "last_object_clicked_tooltip",
-                "last_object_clicked_popup",
             ],
             key=f"mapa_{METRICAS[rotulo]}",
         )
