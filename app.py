@@ -78,6 +78,10 @@ PALETA = ["#1a9850", "#fee08b", "#f46d43", "#a50026"]
 ROTULO_RISCO = {"seca": "seca", "enchente": "enchentes", "calor": "calor extremo"}
 
 
+def formatar_brl(valor: float) -> str:
+    return f"R$ {valor:,.0f}".replace(",", ".")
+
+
 @st.cache_data
 def carregar() -> tuple[pd.DataFrame, dict]:
     return io.load_scores(), io.load_malha_geojson()
@@ -113,24 +117,26 @@ def tela_calculadora(df: pd.DataFrame) -> None:
         orcamento = st.number_input(
             "Orcamento total (R$)", min_value=0, value=100_000_000, step=10_000_000, format="%d"
         )
+        st.caption(f"Orcamento informado: {formatar_brl(orcamento)}")
         st.caption("A alocacao usa os pesos aprendidos pela PCA, sem ajuste manual por categoria.")
     aloc = vuln.alocar(df, orcamento)
     with c2:
         m1, m2 = st.columns(2)
         m1.metric("Municipios contemplados", f"{(aloc.valor_rs > 0).sum()} / 417")
-        m2.metric("Soma alocada", f"R$ {aloc.valor_rs.sum():,.0f}")
+        m2.metric("Soma alocada", formatar_brl(aloc.valor_rs.sum()))
     st.caption(
         f"Municipios com risco abaixo do limiar de contemplacao ({vuln.LIMIAR_CONTEMPLACAO:.0%}) "
         "nao recebem verba: baixo risco climatico nao e prioridade e evita micro-transferencias."
     )
     tabela = aloc.rename(columns={"nome": "Municipio", "peso": "Peso", "valor_rs": "Valor (R$)", "ameaca": "Ameaca"})
+    tabela["Valor (R$)"] = tabela["Valor (R$)"].map(formatar_brl)
     st.dataframe(
         tabela[["Municipio", "Ameaca", "Peso", "Valor (R$)"]],
         width="stretch", height=420,
         column_config={
             "Ameaca": st.column_config.ProgressColumn(format="%.2f", min_value=0, max_value=1),
             "Peso": st.column_config.NumberColumn(format="%.5f"),
-            "Valor (R$)": st.column_config.NumberColumn(format="R$ %.0f"),
+            "Valor (R$)": st.column_config.TextColumn(),
         },
     )
     st.download_button("Baixar alocacao (CSV)", aloc.to_csv(index=False).encode(), "alocacao.csv", "text/csv")
