@@ -40,10 +40,11 @@ Não há "score verdadeiro" rotulado, então o motor é **100% não-supervisiona
 - **PCA** aprende o peso de cada risco a partir da variância (pesos data-driven, não chutados).
 - **KMeans** agrupa os municípios em arquétipos de vulnerabilidade.
 - **Projeção temporal** ajusta a tendência de 21 anos e projeta o risco para 2030.
-- **OpenAI GPT** (`gpt-4o-mini`, configuravel) traduz os números em linguagem e recomenda gasto.
-  A IA **não calcula o score**, só explica — honesto e auditável. Sem chave, usa fallback offline.
+- As explicações no app são determinísticas e derivadas dos próprios índices. Não há camada de LLM,
+  para reduzir complexidade operacional e evitar dependência de chave externa.
 
-Evitamos "IA falsa": slider rotulado de IA, sentimento de notícia, chatbot que alucina.
+Evitamos "IA falsa": slider rotulado de IA, sentimento de notícia, chatbot que alucina ou explicação
+gerada por LLM sem necessidade.
 
 ---
 
@@ -115,8 +116,6 @@ src/municipios_score/
   vulnerabilidade.py    PCA + IDW + capacidade + peso per-capita + calculadora
   arquetipos.py         KMeans (tipologias)
   projecao.py           projecao temporal 2026-2030
-  ia.py                 OpenAI GPT explica/recomenda (fallback offline)
-  config.py             carrega .env e detecta provedor de LLM (chave nunca versionada)
   io.py                 caminhos e carregadores (data/processed -> examples/ fallback)
 scripts/                baixar_municipios_ibge.py, build_scores.py
 app.py                  app Streamlit (calculadora, mapa, arquetipos)

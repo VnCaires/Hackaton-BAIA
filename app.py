@@ -17,7 +17,7 @@ import pandas as pd
 import streamlit as st
 from streamlit_folium import st_folium
 
-from municipios_score import ia, io, vulnerabilidade as vuln
+from municipios_score import io, vulnerabilidade as vuln
 
 st.set_page_config(
     page_title="Calculadora de Orcamento Climatico - Bahia", layout="wide", page_icon="BA"
@@ -75,6 +75,7 @@ METRICAS = {
     "Projecao 2030": "ameaca_futura",
 }
 PALETA = ["#1a9850", "#fee08b", "#f46d43", "#a50026"]
+ROTULO_RISCO = {"seca": "seca", "enchente": "enchentes", "calor": "calor extremo"}
 
 
 @st.cache_data
@@ -158,7 +159,11 @@ def tela_mapa(df: pd.DataFrame, geo: dict) -> None:
         c2.metric("Enchente", f"{r.enchente:.0%}")
         c3.metric("Calor", f"{r.calor:.0%}")
         st.caption(f"Arquetipo: {r.arquetipo} | Tendencia: {r.tendencia} | IDHM {r.idhm:.3f}")
-        st.info(ia.explicar_municipio(nome, sub, r.arquetipo, r.tendencia))
+        risco, valor = max(sub.items(), key=lambda item: item[1])
+        st.info(
+            f"Maior fator de risco: {ROTULO_RISCO[risco]} ({valor:.0%}). "
+            f"Perfil: {r.arquetipo}; tendencia historica: {str(r.tendencia).lower()}."
+        )
 
 
 def tela_arquetipos(df: pd.DataFrame) -> None:
