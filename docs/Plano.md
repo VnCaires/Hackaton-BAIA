@@ -43,8 +43,8 @@ Não há "score verdadeiro" rotulado, então o motor é **100% não-supervisiona
 - As explicações no app são determinísticas e derivadas dos próprios índices. Não há camada de LLM,
   para reduzir complexidade operacional e evitar dependência de chave externa.
 
-Evitamos "IA falsa": slider rotulado de IA, sentimento de notícia, chatbot que alucina ou explicação
-gerada por LLM sem necessidade.
+Evitamos "IA falsa": controles que simulam inteligência, sentimento de notícia, chatbot que alucina
+ou explicação gerada por LLM sem necessidade. A alocação usa sempre os pesos aprendidos pela PCA.
 
 ---
 
@@ -89,7 +89,7 @@ entre os contemplados.
 - **Salvador**: ameaça ≈ 0,00 (litoral chuvoso), peso ≈ 0.
 - Maiores pesos: municípios pobres do sertão (Pilão Arcado, Lamarão, Umburanas), alta ameaça e
   baixo IDHM.
-- Slider SECA → topo no sertão; slider ENCHENTE → litoral / Região Metropolitana.
+- Pesos por risco vêm da PCA; não há ajuste manual por categoria na calculadora.
 
 ---
 

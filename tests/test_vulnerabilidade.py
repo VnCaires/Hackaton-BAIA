@@ -2,7 +2,6 @@ import pandas as pd
 
 from municipios_score import alocar, peso_per_capita
 from municipios_score.vulnerabilidade import (
-    hazard_por_pesos,
     idw,
     normalizar_robusto,
     subindices_estacao,
@@ -52,19 +51,6 @@ def test_idw_interpola_entre_estacoes() -> None:
     destino = pd.DataFrame({"codigo": ["m1"], "lat": [0.0], "lon": [1.0]})
     out = idw(valores, origem, destino, k=2)
     assert 0.0 < out.loc[0, "x"] < 1.0
-
-
-def test_hazard_por_pesos_renormaliza_e_isola_categoria() -> None:
-    df = pd.DataFrame({
-        "seca": [0.1, 0.9], "enchente": [0.9, 0.1], "calor": [0.5, 0.5], "ameaca": [0.5, 0.5],
-    })
-    so_seca = hazard_por_pesos(df, 1.0, 0.0, 0.0)
-    assert so_seca.iloc[1] > so_seca.iloc[0]  # quem tem mais seca pesa mais
-
-
-def test_hazard_pesos_zerados_usa_ameaca() -> None:
-    df = pd.DataFrame({"seca": [0.3], "enchente": [0.3], "calor": [0.3], "ameaca": [0.7]})
-    assert hazard_por_pesos(df, 0.0, 0.0, 0.0).iloc[0] == 0.7
 
 
 def test_limiar_contemplacao_zera_baixo_risco() -> None:

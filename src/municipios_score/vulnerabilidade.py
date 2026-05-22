@@ -149,15 +149,6 @@ def peso_per_capita(ameaca: pd.Series, capacidade: pd.Series) -> pd.Series:
     return bruto / total if total else bruto
 
 
-def hazard_por_pesos(df: pd.DataFrame, w_seca: float, w_enchente: float, w_calor: float) -> pd.Series:
-    """Ameaca alternativa por pesos do usuario (sliders), re-normalizados para somar 1."""
-    total = w_seca + w_enchente + w_calor
-    if total == 0:
-        return df["ameaca"]
-    combo = (w_seca * df["seca"] + w_enchente * df["enchente"] + w_calor * df["calor"]) / total
-    return normalizar_robusto(combo)
-
-
 def alocar(df: pd.DataFrame, orcamento: float, coluna_peso: str = "peso") -> pd.DataFrame:
     """Distribui o orcamento entre municipios proporcional ao peso (soma = orcamento)."""
     pesos = df[coluna_peso] / df[coluna_peso].sum()
