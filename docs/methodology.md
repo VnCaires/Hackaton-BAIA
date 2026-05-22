@@ -20,7 +20,8 @@ calculadora de orcamento. Framework IPCC: `vulnerabilidade ~ ameaca / capacidade
 4. Capacidade adaptativa = IDHM; peso per capita = `ameaca / IDHM`, normalizado para somar 1.
 5. KMeans gera arquetipos; projecao temporal (tendencia linear 2000-2021) estima o risco em 2030.
 
-Detalhes completos em `docs/Plano.md`. A IA de linguagem (Claude) apenas explica o score, nao o calcula.
+Detalhes completos em `docs/Plano.md`. O app explica os resultados de forma deterministica a partir
+dos indices calculados, sem dependencia de LLM.
 
 ## Decisoes a validar
 

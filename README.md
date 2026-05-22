@@ -9,7 +9,8 @@ Plano completo e metodologia: [`docs/Plano.md`](docs/Plano.md)
 
 INMET (21 anos) -> sub-indices seca/enchente/calor -> **PCA** aprende a ameaca -> **IDW** interpola
 45 estacoes para 417 municipios -> capacidade adaptativa (IDHM) -> **peso per capita que soma 1**.
-Mais **KMeans** (arquetipos), **projecao 2030** e **OpenAI GPT** (explica). Tudo nao-supervisionado.
+Mais **KMeans** (arquetipos) e **projecao 2030**. Tudo nao-supervisionado, auditavel e sem
+dependencia de LLM para explicar resultados.
 
 ```bash
 pip install -e ".[app]"
@@ -32,13 +33,6 @@ O **dataset bruto do INMET** (CSV horario, 549 MB) nao vai no Git (regra do proj
 - **Google Drive** (oficial): pasta `01_DADOS_OFICIAIS`.
 
 Baixe com `python scripts/baixar_dataset_inmet.py` (tenta o Release, cai para o Drive).
-
-## IA (opcional)
-
-As explicacoes por municipio usam um LLM. **Sem chave, ha um fallback offline deterministico**
-(o app nunca quebra). Para ativar o LLM, copie `.env.example` para `.env` e preencha
-`OPENAI_API_KEY` (provedor padrao: OpenAI; `gpt-4o-mini`). O score em si (PCA/KMeans/projecao)
-nao depende de IA externa.
 
 ## Objetivo (baseline generico)
 
