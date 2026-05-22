@@ -60,6 +60,7 @@ METRICAS = {
 }
 PALETA = ["#1a9850", "#fee08b", "#f46d43", "#a50026"]
 ROTULO_RISCO = {"seca": "seca", "enchente": "enchentes", "calor": "calor extremo"}
+ORCAMENTO_KEY = "orcamento_total_texto"
 
 
 def formatar_brl(valor: float) -> str:
@@ -69,6 +70,10 @@ def formatar_brl(valor: float) -> str:
 def parsear_brl(texto: str) -> int:
     digitos = "".join(char for char in texto if char.isdigit())
     return int(digitos) if digitos else 0
+
+
+def normalizar_orcamento_input() -> None:
+    st.session_state[ORCAMENTO_KEY] = formatar_brl(parsear_brl(st.session_state[ORCAMENTO_KEY]))
 
 
 @st.cache_data
@@ -103,12 +108,15 @@ def tela_calculadora(df: pd.DataFrame) -> None:
     st.subheader("Quanto cada municipio recebe do orcamento")
     c1, c2 = st.columns([1, 2])
     with c1:
-        orcamento_texto = st.text_input(
+        if ORCAMENTO_KEY not in st.session_state:
+            st.session_state[ORCAMENTO_KEY] = formatar_brl(100_000_000)
+        st.text_input(
             "Orcamento total (R$)",
-            value=formatar_brl(100_000_000),
-            help="Use ponto para separar milhares, por exemplo: R$ 100.000.000",
+            key=ORCAMENTO_KEY,
+            help="Digite apenas numeros ou use ponto nos milhares. Exemplo: R$ 1.300.000",
+            on_change=normalizar_orcamento_input,
         )
-        orcamento = parsear_brl(orcamento_texto)
+        orcamento = parsear_brl(st.session_state[ORCAMENTO_KEY])
         st.caption(f"Orcamento informado: {formatar_brl(orcamento)}")
         st.caption("A alocacao usa os pesos aprendidos pela PCA, sem ajuste manual por categoria.")
     aloc = vuln.alocar(df, orcamento)
