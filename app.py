@@ -118,7 +118,6 @@ def tela_calculadora(df: pd.DataFrame) -> None:
             on_change=normalizar_orcamento_input,
         )
         orcamento = parsear_brl(st.session_state[ORCAMENTO_KEY])
-        st.caption(f"Orcamento informado: {formatar_brl(orcamento)}")
         st.caption("A alocacao usa os pesos aprendidos pela PCA, sem ajuste manual por categoria.")
     aloc = vuln.alocar(df, orcamento)
     with c2:
