@@ -34,12 +34,6 @@ _CSS = """
   .hero h1 { font-size: 28px; font-weight: 700; margin: 0 0 4px; letter-spacing: -.4px; }
   .hero p { margin: 0; opacity: .92; font-size: 15px; max-width: 760px; }
   .hero .gold { color: #FBBF24; font-weight: 700; }
-  .kpi-row { display: flex; gap: 12px; flex-wrap: wrap; margin: 2px 0 18px; }
-  .kpi { flex: 1; min-width: 130px; background: #fff; border: 1px solid #DBEAFE;
-    border-left: 4px solid #D97706; border-radius: 10px; padding: 12px 16px; }
-  .kpi b { display: block; font-size: 24px; color: #1E3A8A; line-height: 1.1;
-    font-variant-numeric: tabular-nums; }
-  .kpi span { font-size: 11px; color: #5B6B86; text-transform: uppercase; letter-spacing: .4px; }
   div[data-testid="stMetricValue"] { color: #1E3A8A; }
   .stButton>button, .stDownloadButton>button { border-radius: 8px; font-weight: 600; }
   .stTabs [data-baseweb="tab"] { font-weight: 600; }
@@ -57,16 +51,6 @@ def _hero() -> None:
         "investir.</p></div>",
         unsafe_allow_html=True,
     )
-    st.markdown(
-        '<div class="kpi-row">'
-        '<div class="kpi"><b>417</b><span>municipios</span></div>'
-        '<div class="kpi"><b>21 anos</b><span>INMET 2000-2021</span></div>'
-        '<div class="kpi"><b>45</b><span>estacoes</span></div>'
-        '<div class="kpi"><b>&Sigma; = 1</b><span>pesos normalizados</span></div>'
-        "</div>",
-        unsafe_allow_html=True,
-    )
-
 METRICAS = {
     "Vulnerabilidade geral": "ameaca",
     "Seca": "seca",
