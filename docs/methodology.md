@@ -27,7 +27,7 @@ dos indices calculados, sem dependencia de LLM.
 
 - Tratamento de nulos (`-9999` do INMET tratado como NaN; ano exige >=55% de dias validos).
 - Tratamento de outliers (normalizacao robusta p5-p95 nos sub-indices climaticos).
-- Pesos por tema (PCA data-driven por padrao; sliders no app re-normalizam para somar 1).
+- Pesos por tema aprendidos pela PCA, sem ajuste manual por categoria no app.
 - Validacao com metricas externas (cruzar com S2iD/Atlas de Desastres e Monitor de Secas da ANA).
 - Empates no ranking.
 - Capacidade adaptativa: hoje IDHM 2010; extensivel com desemprego/cobertura de saude/PIB.

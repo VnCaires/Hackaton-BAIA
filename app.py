@@ -113,16 +113,8 @@ def tela_calculadora(df: pd.DataFrame) -> None:
         orcamento = st.number_input(
             "Orcamento total (R$)", min_value=0, value=100_000_000, step=10_000_000, format="%d"
         )
-        st.caption("Peso relativo de cada risco (re-normalizado para somar 1):")
-        ws = st.slider("Seca", 0.0, 1.0, 0.33, 0.01)
-        wf = st.slider("Enchente", 0.0, 1.0, 0.33, 0.01)
-        wc = st.slider("Calor", 0.0, 1.0, 0.34, 0.01)
-        usar_sliders = st.checkbox("Usar pesos personalizados (em vez do PCA)", value=False)
-    base = df.copy()
-    if usar_sliders:
-        hazard = vuln.hazard_por_pesos(base, ws, wf, wc)
-        base["peso"] = vuln.peso_per_capita(hazard, base["capacidade"]).to_numpy()
-    aloc = vuln.alocar(base, orcamento)
+        st.caption("A alocacao usa os pesos aprendidos pela PCA, sem ajuste manual por categoria.")
+    aloc = vuln.alocar(df, orcamento)
     with c2:
         m1, m2 = st.columns(2)
         m1.metric("Municipios contemplados", f"{(aloc.valor_rs > 0).sum()} / 417")
