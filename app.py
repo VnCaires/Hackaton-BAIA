@@ -77,6 +77,7 @@ METRICAS = {
 PALETA = ["#1a9850", "#fee08b", "#f46d43", "#a50026"]
 ROTULO_RISCO = {"seca": "seca", "enchente": "enchentes", "calor": "calor extremo"}
 ORCAMENTO_KEY = "orcamento_total_texto"
+ORCAMENTO_PADRAO = 1_300_000_000
 
 
 def formatar_brl(valor: float) -> str:
@@ -125,7 +126,7 @@ def tela_calculadora(df: pd.DataFrame) -> None:
     c1, c2 = st.columns([1, 2])
     with c1:
         if ORCAMENTO_KEY not in st.session_state:
-            st.session_state[ORCAMENTO_KEY] = formatar_brl(100_000_000)
+            st.session_state[ORCAMENTO_KEY] = formatar_brl(ORCAMENTO_PADRAO)
         st.text_input(
             "Orcamento total (R$)",
             key=ORCAMENTO_KEY,
