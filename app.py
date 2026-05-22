@@ -128,15 +128,15 @@ def tela_calculadora(df: pd.DataFrame) -> None:
         f"Municipios com risco abaixo do limiar de contemplacao ({vuln.LIMIAR_CONTEMPLACAO:.0%}) "
         "nao recebem verba: baixo risco climatico nao e prioridade e evita micro-transferencias."
     )
-    tabela = aloc.rename(columns={"nome": "Municipio", "peso": "Peso", "valor_rs": "Valor (R$)", "ameaca": "Ameaca"})
-    tabela["Valor (R$)"] = tabela["Valor (R$)"].map(formatar_brl)
+    tabela = aloc.rename(columns={"nome": "Municipio", "peso": "Peso", "ameaca": "Ameaca"})
+    tabela["Valor orcado"] = tabela["valor_rs"].map(formatar_brl)
     st.dataframe(
-        tabela[["Municipio", "Ameaca", "Peso", "Valor (R$)"]],
+        tabela[["Municipio", "Ameaca", "Peso", "Valor orcado"]],
         width="stretch", height=420,
         column_config={
             "Ameaca": st.column_config.ProgressColumn(format="%.2f", min_value=0, max_value=1),
             "Peso": st.column_config.NumberColumn(format="%.5f"),
-            "Valor (R$)": st.column_config.TextColumn(),
+            "Valor orcado": st.column_config.TextColumn(),
         },
     )
     st.download_button("Baixar alocacao (CSV)", aloc.to_csv(index=False).encode(), "alocacao.csv", "text/csv")
