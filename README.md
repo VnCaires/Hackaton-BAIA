@@ -4,7 +4,6 @@ Distribui um orçamento público entre os **417 municípios da Bahia** de forma 
 risco climático de cada um. Não prevê o tempo: responde **onde investir** para reduzir
 vulnerabilidade.
 
-- **Demonstração visual:** https://termometro-climatico-bahia.surge.sh
 - **Metodologia completa:** [`docs/Plano.md`](docs/Plano.md) e [`docs/methodology.md`](docs/methodology.md)
 
 ## O problema
