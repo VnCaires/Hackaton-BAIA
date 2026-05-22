@@ -62,6 +62,7 @@ PALETA = ["#1a9850", "#fee08b", "#f46d43", "#a50026"]
 ROTULO_RISCO = {"seca": "seca", "enchente": "enchentes", "calor": "calor extremo"}
 ORCAMENTO_KEY = "orcamento_total_texto"
 ORCAMENTO_PADRAO = 1_300_000_000
+MUNICIPIO_KEY = "municipio_inspecionado"
 
 
 def formatar_brl(valor: float) -> str:
@@ -100,9 +101,35 @@ def mapa(df: pd.DataFrame, geo: dict, coluna: str) -> folium.Map:
             "weight": 0.4, "fillOpacity": 0.75,
         },
         tooltip=folium.GeoJsonTooltip(fields=["nome", "valor"], aliases=["Municipio", "Indice"]),
+        popup=folium.GeoJsonPopup(fields=["codarea"], aliases=["Codigo"]),
     ).add_to(m)
     escala.add_to(m)
     return m
+
+
+def municipio_do_clique(retorno_mapa: dict | None, df: pd.DataFrame) -> str | None:
+    if not retorno_mapa:
+        return None
+    desenho = retorno_mapa.get("last_active_drawing") or {}
+    props = desenho.get("properties") or {}
+    codigo = str(props.get("codarea") or "")
+    if codigo:
+        linha = df[df["codigo"].astype(str) == codigo]
+        if not linha.empty:
+            return str(linha.iloc[0]["nome"])
+    nome = props.get("nome")
+    if nome in set(df["nome"]):
+        return str(nome)
+
+    textos = [
+        str(retorno_mapa.get("last_object_clicked_tooltip") or ""),
+        str(retorno_mapa.get("last_object_clicked_popup") or ""),
+    ]
+    for texto in textos:
+        for _, linha in df.iterrows():
+            if str(linha["codigo"]) in texto or str(linha["nome"]) in texto:
+                return str(linha["nome"])
+    return None
 
 
 def tela_calculadora(df: pd.DataFrame) -> None:
@@ -144,11 +171,32 @@ def tela_calculadora(df: pd.DataFrame) -> None:
 
 def tela_mapa(df: pd.DataFrame, geo: dict) -> None:
     col_mapa, col_painel = st.columns([2, 1])
+    municipios = sorted(df["nome"])
+    if MUNICIPIO_KEY not in st.session_state:
+        st.session_state[MUNICIPIO_KEY] = municipios[0]
     with col_mapa:
         rotulo = st.selectbox("Camada de risco", list(METRICAS), index=0)
-        st_folium(mapa(df, geo, METRICAS[rotulo]), height=560, width="stretch")
+        retorno_mapa = st_folium(
+            mapa(df, geo, METRICAS[rotulo]),
+            height=560,
+            width="stretch",
+            returned_objects=[
+                "last_active_drawing",
+                "last_object_clicked_tooltip",
+                "last_object_clicked_popup",
+            ],
+            key=f"mapa_{METRICAS[rotulo]}",
+        )
+        municipio_clicado = municipio_do_clique(retorno_mapa, df)
+        if municipio_clicado:
+            st.session_state[MUNICIPIO_KEY] = municipio_clicado
     with col_painel:
-        nome = st.selectbox("Inspecionar municipio", sorted(df["nome"]))
+        nome = st.selectbox(
+            "Inspecionar municipio",
+            municipios,
+            index=municipios.index(st.session_state[MUNICIPIO_KEY]),
+            key=MUNICIPIO_KEY,
+        )
         r = df[df["nome"] == nome].iloc[0]
         sub = {"seca": r.seca, "enchente": r.enchente, "calor": r.calor}
         st.metric("Ameaca composta", f"{r.ameaca:.0%}")
