@@ -1,111 +1,100 @@
-# Hackaton BAIA — Calculadora de Orcamento Climatico
+# Calculadora de Orçamento Climático da Bahia
 
-Repositorio colaborativo para desenvolver um indice de vulnerabilidade climatica e uma calculadora de orcamento para os 417 municipios da Bahia.
+Distribui um orçamento público entre os **417 municípios da Bahia** de forma proporcional ao
+risco climático de cada um. Não prevê o tempo: responde **onde investir** para reduzir
+vulnerabilidade.
 
-Apresentacao visual: https://termometro-climatico-bahia.surge.sh
-Plano completo e metodologia: [`docs/Plano.md`](docs/Plano.md)
+- **Demonstração visual:** https://termometro-climatico-bahia.surge.sh
+- **Metodologia completa:** [`docs/Plano.md`](docs/Plano.md) e [`docs/methodology.md`](docs/methodology.md)
+
+## O problema
+
+Recursos para adaptação climática são escassos e a alocação costuma ser política ou uniforme.
+Falta um critério objetivo, reproduzível e auditável para responder: dado um orçamento, **quanto
+cada município deve receber** segundo o risco climático que enfrenta.
+
+## A solução
+
+Um índice de vulnerabilidade climática construído a partir de 21 anos de dados do INMET, que vira
+um peso por município (somando 1) e converte qualquer orçamento em uma alocação justificada.
+
+| Indicador | Valor |
+|---|---|
+| Municípios cobertos | 417 (todos da Bahia) |
+| Série histórica | 21 anos (INMET, 2000–2021) |
+| Estações meteorológicas | 45 |
+| Pesos de vulnerabilidade | normalizados, somam 1 |
 
 ## Como funciona
 
-INMET (21 anos) -> sub-indices seca/enchente/calor -> **PCA** aprende a ameaca -> **IDW** interpola
-45 estacoes para 417 municipios -> capacidade adaptativa (IDHM) -> **peso per capita que soma 1**.
-Mais **KMeans** (arquetipos) e **projecao 2030**. Tudo nao-supervisionado, auditavel e sem
-dependencia de LLM para explicar resultados.
+```
+INMET (21 anos)
+  -> sub-índices de seca, enchente e calor por estação
+  -> PCA aprende a ameaça composta (não-supervisionado)
+  -> IDW interpola as 45 estações para os 417 municípios
+  -> IDHM entra como capacidade adaptativa
+  -> peso per capita normalizado (Σ = 1)
+  -> KMeans agrupa arquétipos + projeção de tendência até 2030
+```
+
+Todo o pipeline é **não-supervisionado e auditável**, sem dependência de LLM para gerar ou
+justificar os resultados.
+
+## O que o app entrega
+
+- **Calculadora de Orçamento:** informe o valor total e veja a alocação por município, com pesos
+  ajustáveis por tipo de risco e exportação em CSV.
+- **Mapa de Risco:** mapa coroplético dos 417 municípios por camada (vulnerabilidade geral, seca,
+  enchente, calor e projeção 2030).
+- **Arquétipos & Projeção:** agrupamento KMeans dos perfis de vulnerabilidade e a tendência
+  histórica projetada para 2026–2030.
+
+## Como rodar
 
 ```bash
 pip install -e ".[app]"
-python scripts/build_scores.py   # gera data/processed/scores.csv (usa examples/, sem dataset bruto)
-streamlit run app.py             # sobe a calculadora
+python scripts/build_scores.py   # gera data/processed/scores.csv a partir de examples/
+streamlit run app.py             # abre a calculadora no navegador
 ```
 
-O app e o build funcionam com os exemplos versionados em `examples/` mesmo sem o dataset bruto.
-Para regenerar tudo do zero: `python scripts/baixar_municipios_ibge.py` (IBGE+IDHM) e
-`python scripts/baixar_dataset_inmet.py` (CSV bruto), depois `build_scores.py`.
+O app e o build funcionam com os exemplos versionados em `examples/`, **sem precisar baixar o
+dataset bruto**.
 
-## Dados
+Para rodar os testes:
 
-O **necessario ja esta no repositorio** (pequeno, em `examples/`): indicadores por estacao,
-malha municipal, populacao+IDHM e os scores finais. Por isso o app roda sem baixar nada.
+```bash
+pip install -e ".[dev]"
+pytest
+```
 
-O **dataset bruto do INMET** (CSV horario, 549 MB) nao vai no Git (regra do projeto). Fica em:
+## Dados e reprodutibilidade
 
-- **GitHub Release**: [`dataset-v1`](https://github.com/VnCaires/Hackaton-BAIA/releases/tag/dataset-v1) (`clima_bahia.csv.gz`, ~122 MB) — mirror para reprodutibilidade.
-- **Google Drive** (oficial): pasta `01_DADOS_OFICIAIS`.
+O necessário já está no repositório (`examples/`): indicadores por estação, malha municipal,
+população + IDHM e os scores finais. Por isso o app roda sem baixar nada.
 
-Baixe com `python scripts/baixar_dataset_inmet.py` (tenta o Release, cai para o Drive).
+O dataset bruto do INMET (CSV horário, 549 MB) não é versionado. Para regenerar tudo do zero:
 
-## Objetivo (baseline generico)
+```bash
+python scripts/baixar_municipios_ibge.py   # IBGE + IDHM
+python scripts/baixar_dataset_inmet.py      # CSV bruto (GitHub Release, fallback Google Drive)
+python scripts/build_scores.py
+```
 
-O baseline tambem oferece um pipeline reproduzivel de score ponderado:
-
-1. Carrega datasets de municipios.
-2. Padroniza indicadores em uma escala comum.
-3. Calcula um score ponderado por municipio.
-4. Converte scores em pesos de vulnerabilidade que somam 1.
-5. Recomenda quanto cada municipio deve receber a partir de um orcamento total.
-6. Gera rankings e artefatos para analise.
-
-Para a visao de produto, escopo e guia tecnico da equipe, consulte `docs/project_overview.md`.
+- **GitHub Release:** [`dataset-v1`](https://github.com/VnCaires/Hackaton-BAIA/releases/tag/dataset-v1) (`clima_bahia.csv.gz`, ~122 MB)
+- `data/sample/clima_bahia_2020.csv.gz`: recorte do último ano completo, para desenvolvimento local.
 
 ## Estrutura
 
 ```text
 .
-|-- data/
-|   |-- raw/          # datasets originais, nao versionados
-|   |-- interim/      # dados intermediarios, nao versionados
-|   |-- processed/    # dados finais, nao versionados
-|   |-- sample/       # recortes pequenos versionados para desenvolvimento
-|   `-- README.md
-|-- docs/             # dicionario de dados e decisoes do projeto
-|-- examples/         # exemplos pequenos e seguros para versionar
-|-- notebooks/        # exploracoes e analises
-|-- src/
-|   `-- municipios_score/
-|-- tests/
-|-- .github/
-`-- requirements.txt
+├── app.py                  # aplicação Streamlit (calculadora, mapa, arquétipos)
+├── scripts/                # download de dados e geração de scores
+├── src/municipios_score/   # pipeline: índices, PCA/IDW, arquétipos, projeção
+├── examples/               # dados de exemplo versionados (app roda sem download)
+├── data/                   # raw/interim/processed/sample (brutos não versionados)
+├── docs/                   # metodologia, dicionário de dados e visão de produto
+└── tests/                  # suíte de testes (pytest)
 ```
 
-## Comeco rapido
-
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -e ".[dev]"
-pytest
-```
-
-Para calcular scores com os arquivos de exemplo:
-
-```bash
-python -m municipios_score.cli examples/indicadores_exemplo.csv examples/config_score_exemplo.json outputs/scores.csv
-```
-
-O repositorio inclui `data/sample/clima_bahia_2020.csv.gz`, um recorte comprimido do ultimo ano completo do dataset climatico. Ele serve para desenvolvimento local sem baixar o CSV bruto completo.
-
-## Fluxo de colaboracao
-
-- Trabalhem em branches curtas, como `feature/normalizacao-dados` ou `fix/pesos-score`.
-- Abram pull requests para `main`.
-- Cada PR deve explicar o que mudou, como testar e se houve mudanca em datasets.
-- Evitem commitar dados grandes, sensiveis ou proprietarios. Usem `data/` localmente e versionem apenas amostras pequenas em `examples/`.
-- Registrem decisoes de metodologia em `docs/`.
-
-## Metodologia inicial de score
-
-O score base usa normalizacao min-max por indicador:
-
-- `positive`: quanto maior o indicador, melhor o score.
-- `negative`: quanto menor o indicador, melhor o score.
-
-O score final e a media ponderada dos indicadores normalizados, em escala de 0 a 100.
-
-Essa metodologia e propositalmente simples para servir como baseline. Durante o hackathon, documentem ajustes como tratamento de outliers, imputacao de nulos, pesos e validacao.
-
-## Cuidados com dados
-
-- Nunca suba arquivos brutos grandes para o Git.
-- Inclua fonte, data de coleta, licenca e granularidade em `docs/data_dictionary.md`.
-- Use nomes de colunas estaveis e documentados.
-- Se for preciso compartilhar datasets grandes, use armazenamento externo e registre o link no README ou em `docs/`.
+Documentação detalhada em [`docs/`](docs): [`methodology.md`](docs/methodology.md),
+[`data_dictionary.md`](docs/data_dictionary.md) e [`project_overview.md`](docs/project_overview.md).
