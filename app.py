@@ -82,6 +82,11 @@ def formatar_brl(valor: float) -> str:
     return f"R$ {valor:,.0f}".replace(",", ".")
 
 
+def parsear_brl(texto: str) -> int:
+    digitos = "".join(char for char in texto if char.isdigit())
+    return int(digitos) if digitos else 0
+
+
 @st.cache_data
 def carregar() -> tuple[pd.DataFrame, dict]:
     return io.load_scores(), io.load_malha_geojson()
@@ -114,9 +119,12 @@ def tela_calculadora(df: pd.DataFrame) -> None:
     st.subheader("Quanto cada municipio recebe do orcamento")
     c1, c2 = st.columns([1, 2])
     with c1:
-        orcamento = st.number_input(
-            "Orcamento total (R$)", min_value=0, value=100_000_000, step=10_000_000, format="%d"
+        orcamento_texto = st.text_input(
+            "Orcamento total (R$)",
+            value=formatar_brl(100_000_000),
+            help="Use ponto para separar milhares, por exemplo: R$ 100.000.000",
         )
+        orcamento = parsear_brl(orcamento_texto)
         st.caption(f"Orcamento informado: {formatar_brl(orcamento)}")
         st.caption("A alocacao usa os pesos aprendidos pela PCA, sem ajuste manual por categoria.")
     aloc = vuln.alocar(df, orcamento)
