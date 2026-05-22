@@ -155,4 +155,4 @@ def alocar(df: pd.DataFrame, orcamento: float, coluna_peso: str = "peso") -> pd.
     out = df[["codigo", "nome", "populacao", "idhm", "ameaca"]].copy()
     out["peso"] = pesos.to_numpy()
     out["valor_rs"] = (pesos * orcamento).to_numpy()
-    return out.sort_values("valor_rs", ascending=False).reset_index(drop=True)
+    return out.sort_values("nome").reset_index(drop=True)
