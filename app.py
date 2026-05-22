@@ -82,6 +82,11 @@ def formatar_brl(valor: float) -> str:
     return f"R$ {valor:,.0f}".replace(",", ".")
 
 
+def parsear_brl(texto: str) -> int:
+    digitos = "".join(char for char in texto if char.isdigit())
+    return int(digitos) if digitos else 0
+
+
 @st.cache_data
 def carregar() -> tuple[pd.DataFrame, dict]:
     return io.load_scores(), io.load_malha_geojson()
@@ -114,9 +119,12 @@ def tela_calculadora(df: pd.DataFrame) -> None:
     st.subheader("Quanto cada municipio recebe do orcamento")
     c1, c2 = st.columns([1, 2])
     with c1:
-        orcamento = st.number_input(
-            "Orcamento total (R$)", min_value=0, value=100_000_000, step=10_000_000, format="%d"
+        orcamento_texto = st.text_input(
+            "Orcamento total (R$)",
+            value=formatar_brl(100_000_000),
+            help="Use ponto para separar milhares, por exemplo: R$ 100.000.000",
         )
+        orcamento = parsear_brl(orcamento_texto)
         st.caption(f"Orcamento informado: {formatar_brl(orcamento)}")
         st.caption("A alocacao usa os pesos aprendidos pela PCA, sem ajuste manual por categoria.")
     aloc = vuln.alocar(df, orcamento)
@@ -128,15 +136,15 @@ def tela_calculadora(df: pd.DataFrame) -> None:
         f"Municipios com risco abaixo do limiar de contemplacao ({vuln.LIMIAR_CONTEMPLACAO:.0%}) "
         "nao recebem verba: baixo risco climatico nao e prioridade e evita micro-transferencias."
     )
-    tabela = aloc.rename(columns={"nome": "Municipio", "peso": "Peso", "valor_rs": "Valor (R$)", "ameaca": "Ameaca"})
-    tabela["Valor (R$)"] = tabela["Valor (R$)"].map(formatar_brl)
+    tabela = aloc.rename(columns={"nome": "Municipio", "peso": "Peso", "ameaca": "Ameaca"})
+    tabela["Valor orcado"] = tabela["valor_rs"].map(formatar_brl)
     st.dataframe(
-        tabela[["Municipio", "Ameaca", "Peso", "Valor (R$)"]],
+        tabela[["Municipio", "Ameaca", "Peso", "Valor orcado"]],
         width="stretch", height=420,
         column_config={
             "Ameaca": st.column_config.ProgressColumn(format="%.2f", min_value=0, max_value=1),
             "Peso": st.column_config.NumberColumn(format="%.5f"),
-            "Valor (R$)": st.column_config.TextColumn(),
+            "Valor orcado": st.column_config.TextColumn(),
         },
     )
     st.download_button("Baixar alocacao (CSV)", aloc.to_csv(index=False).encode(), "alocacao.csv", "text/csv")
