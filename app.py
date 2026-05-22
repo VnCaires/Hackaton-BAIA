@@ -126,7 +126,7 @@ def tela_calculadora(df: pd.DataFrame) -> None:
     tabela = aloc.rename(columns={"nome": "Municipio", "peso": "Peso", "valor_rs": "Valor (R$)", "ameaca": "Ameaca"})
     st.dataframe(
         tabela[["Municipio", "Ameaca", "Peso", "Valor (R$)"]],
-        use_container_width=True, height=420,
+        width="stretch", height=420,
         column_config={
             "Ameaca": st.column_config.ProgressColumn(format="%.2f", min_value=0, max_value=1),
             "Peso": st.column_config.NumberColumn(format="%.5f"),
@@ -140,7 +140,7 @@ def tela_mapa(df: pd.DataFrame, geo: dict) -> None:
     col_mapa, col_painel = st.columns([2, 1])
     with col_mapa:
         rotulo = st.selectbox("Camada de risco", list(METRICAS), index=0)
-        st_folium(mapa(df, geo, METRICAS[rotulo]), height=560, use_container_width=True)
+        st_folium(mapa(df, geo, METRICAS[rotulo]), height=560, width="stretch")
     with col_painel:
         nome = st.selectbox("Inspecionar municipio", sorted(df["nome"]))
         r = df[df["nome"] == nome].iloc[0]
@@ -166,7 +166,7 @@ def tela_arquetipos(df: pd.DataFrame) -> None:
              enchente=("enchente", "mean"), calor=("calor", "mean"))
         .round(2).reset_index()
     )
-    st.dataframe(resumo, use_container_width=True)
+    st.dataframe(resumo, width="stretch")
     st.subheader("Tendencia historica projetada (2026-2030)")
     st.bar_chart(df["tendencia"].value_counts())
 
