@@ -66,12 +66,12 @@ def test_limiar_contemplacao_zera_baixo_risco() -> None:
 
 def test_alocar_distribui_todo_orcamento() -> None:
     df = pd.DataFrame({
-        "codigo": ["1", "2", "3"], "nome": ["A", "B", "C"], "populacao": [100, 200, 300],
+        "codigo": ["1", "2", "3"], "nome": ["C", "A", "B"], "populacao": [100, 200, 300],
         "idhm": [0.6, 0.7, 0.5], "ameaca": [0.2, 0.5, 0.9], "peso": [0.2, 0.3, 0.5],
     })
     aloc = alocar(df, 1_000_000)
     assert abs(aloc["valor_rs"].sum() - 1_000_000) < 1e-3
-    assert aloc.iloc[0]["valor_rs"] >= aloc.iloc[-1]["valor_rs"]  # ordenado desc
+    assert aloc["nome"].tolist() == ["A", "B", "C"]
 
 
 def test_subindices_ficam_em_zero_um() -> None:
