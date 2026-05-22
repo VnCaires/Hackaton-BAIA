@@ -17,12 +17,6 @@ cada município deve receber** segundo o risco climático que enfrenta.
 Um índice de vulnerabilidade climática construído a partir de 21 anos de dados do INMET, que vira
 um peso por município (somando 1) e converte qualquer orçamento em uma alocação justificada.
 
-| Indicador | Valor |
-|---|---|
-| Municípios cobertos | 417 (todos da Bahia) |
-| Série histórica | 21 anos (INMET, 2000–2021) |
-| Estações meteorológicas | 45 |
-| Pesos de vulnerabilidade | normalizados, somam 1 |
 
 ## Como funciona
 
